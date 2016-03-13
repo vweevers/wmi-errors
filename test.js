@@ -114,14 +114,140 @@ test('factory', function (t) {
     })
   })
 
-  t.end()
-})
+  var errors6 = [
+    new wmi.Error(undefined),
+    new wmi.Error(null),
+    new wmi.Error(0),
+    new wmi.Error('beep'),
+    new wmi.Error('OTHER_ERROR'),
+    new wmi.Error('OtherError'),
+    new wmi.OtherError(),
 
-// Not sure if it should..
-test('Unknown type throws', function (t) {
-  t.throws(wmi.Error)
-  t.throws(wmi.Error.bind(wmi.Error, 2))
-  t.ok(wmi.Error(2147749893))
+    wmi.Error(undefined),
+    wmi.Error(null),
+    wmi.Error(0),
+    wmi.Error('beep'),
+    wmi.Error('OTHER_ERROR'),
+    wmi.Error('OtherError'),
+    wmi.OtherError()
+  ]
+
+  errors6.forEach(function (err) {
+    verify(t, err, 'OtherError', {
+      errno: 0,
+      code: null,
+      message: 'Unknown error'
+    })
+  })
+
+  var errors7 = [
+    new wmi.Error('boop', undefined),
+    new wmi.Error('boop', null),
+    new wmi.Error('boop', 0),
+    new wmi.Error('boop', 'beep'),
+    new wmi.Error('boop', 'OTHER_ERROR'),
+    new wmi.Error('boop', 'OtherError'),
+    new wmi.OtherError('boop'),
+
+    wmi.Error('boop', undefined),
+    wmi.Error('boop', null),
+    wmi.Error('boop', 0),
+    wmi.Error('boop', 'beep'),
+    wmi.Error('boop', 'OTHER_ERROR'),
+    wmi.Error('boop', 'OtherError'),
+    wmi.OtherError('boop')
+  ]
+
+  errors7.forEach(function (err) {
+    verify(t, err, 'OtherError', {
+      errno: 0,
+      code: null,
+      message: 'boop',
+      cause: 'Unknown error'
+    })
+  })
+
+  var errors8 = [
+    new wmi.Error(undefined, undefined),
+    new wmi.Error(null, null),
+    new wmi.Error('', undefined),
+    new wmi.Error('', null),
+    new wmi.Error('', ''),
+    new wmi.Error(''),
+    new wmi.Error(undefined),
+    new wmi.Error(),
+
+    wmi.Error(undefined, undefined),
+    wmi.Error(null, null),
+    wmi.Error('', undefined),
+    wmi.Error('', null),
+    wmi.Error('', ''),
+    wmi.Error(''),
+    wmi.Error(undefined),
+    wmi.Error(),
+  ]
+
+  errors8.forEach(function (err) {
+    verify(t, err, 'OtherError', {
+      errno: 0,
+      code: null,
+      message: 'Unknown error',
+      cause: 'Unknown error'
+    })
+  })
+
+  var errors9 = [0, '', undefined, ''].map(function(arg) {
+    var inner = new Error('Beep')
+    inner.errno = 34
+    var outer = new wmi.Error(arg, inner)
+    outer.expectedCause = inner
+    return outer
+  })
+
+  errors9.forEach(function (err) {
+    verify(t, err, 'OtherError', {
+      errno: 34,
+      code: null,
+      message: 'Beep',
+      cause: err.expectedCause
+    })
+  })
+
+  var errors10 = [''].map(function() {
+    var inner = new Error('Beep')
+    inner.errno = 34
+    var outer = new wmi.Error(inner)
+    outer.expectedCause = inner
+    return outer
+  })
+
+  errors10.forEach(function (err) {
+    verify(t, err, 'OtherError', {
+      errno: 34,
+      code: null,
+      message: 'Beep',
+      cause: err.expectedCause
+    })
+  })
+
+  var errors11 = [0, '', undefined, ''].map(function(arg) {
+    var inner = new Error()
+    inner.errno = 34
+    inner.code = 'beep_boop'
+    var outer = new wmi.Error(arg, inner)
+    outer.expectedCause = inner
+    return outer
+  })
+
+  errors11.forEach(function (err) {
+    verify(t, err, 'OtherError', {
+      errno: 34,
+      code: 'beep_boop',
+      message: 'Unknown error',
+      cause: err.expectedCause
+    })
+  })
+
   t.end()
 })
 

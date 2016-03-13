@@ -3,10 +3,10 @@
 var prr = require('prr')
 
 // Factory and generic prototype (helpful for `instanceof`)
-function WmiError (message_, cause_) {
+function WmiError (message_, cause_, _internal) {
   // Called like a factory
-  if (arguments.length) {
-    if (arguments.length === 1 || cause_ === undefined) {
+  if (_internal !== true) {
+    if (arguments.length === 1) {
       var cause = message_, message
     } else {
       cause = cause_
@@ -28,7 +28,7 @@ function WmiError (message_, cause_) {
       }
     }
 
-    if (!type) throw new TypeError('Unknown error code or errno: ' + cause)
+    if (!type) type = exports.OtherError
     if (type !== WmiError) return new type(message, child)
   }
 
@@ -43,13 +43,23 @@ WmiError.prototype = new Error()
 
 function createError (type, code, errno, description) {
   var Type = function (message, cause) {
-    if (!(this instanceof Type)) return new Type(message, cause)
+    if (!(this instanceof Type)) {
+      if (arguments.length < 2) return new Type(message)
+      else return new Type(message, cause)
+    }
 
-    WmiError.call(this)
+    this.extended = true
+    WmiError.call(this, null, null, true)
 
     if (!message) message = description
     else if (typeof message === 'number') message = String(message)
     else if (message && typeof message !== 'string') message = message.message
+
+    if (cause) {
+      // Copy properties of cause error
+      if (!errno && cause.errno) errno = cause.errno
+      if (!code && cause.code) code = cause.code
+    }
 
     prr(this, {
         type    : type
@@ -63,11 +73,13 @@ function createError (type, code, errno, description) {
     if (Error.captureStackTrace) Error.captureStackTrace(this, WmiError)
   }
 
-  Type.prototype = new WmiError()
+  Type.prototype = new WmiError(null, null, true)
   return Type
 }
 
 exports.Error = WmiError
+exports.OtherError = exports.OTHER_ERROR =
+  createError("OtherError", null, 0, "Unknown error")
 
 // Everything below was generated with `node generate`
 
