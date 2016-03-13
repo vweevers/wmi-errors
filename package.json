@@ -1,0 +1,40 @@
+{
+  "name": "wmi-errors",
+  "version": "0.0.1",
+  "description": "Error types for Windows Management Instrumentation (WMI)",
+  "license": "MIT",
+  "author": {
+    "name": "Vincent Weevers",
+    "email": "mail@vincentweevers.nl"
+  },
+  "scripts": {
+    "test": "tape test.js"
+  },
+  "files": [
+    "index.js"
+  ],
+  "dependencies": {
+    "prr": "~1.0.1"
+  },
+  "devDependencies": {
+    "constant-case": "~1.1.2",
+    "pascal-case": "~1.1.2",
+    "stack-parser": "0.0.1",
+    "tape": "~4.5.1"
+  },
+  "keywords": [
+    "cscript",
+    "error",
+    "wbem",
+    "wbemerrorenum",
+    "wmi",
+    "wscript"
+  ],
+  "engines": {
+    "node": ">=0.10.0",
+    "npm": ">=2.0.0"
+  },
+  "repository": "vweevers/wmi-errors",
+  "bugs": "https://github.com/vweevers/wmi-errors/issues",
+  "homepage": "https://github.com/vweevers/wmi-errors"
+}
