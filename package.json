@@ -1,6 +1,6 @@
 {
   "name": "wmi-errors",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "Error types for Windows Management Instrumentation (WMI)",
   "license": "MIT",
   "author": {
